@@ -1,6 +1,6 @@
 # Mobile Learning Platfrom (dev)
 
-This is the current development version of [MLP](http://thekuyuproject.org/2010/09/mobile-learning-platform/).
+This is the current development version of the Kuyu Project's Mobile Learning Platform [MLP](http://thekuyuproject.org/2010/09/mobile-learning-platform/).
 
 ##What it's made of?
 MLP_gae is built to run on top of Google App Engine
