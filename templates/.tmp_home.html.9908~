@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Appocrita{% endblock %}
+
+{% block header %}
+{% include "header.html" %}
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
+
+{% block footer %}
+{% include "footer.html" %}
+{% endblock %}

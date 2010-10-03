@@ -8,14 +8,14 @@ except ImportError:
 
 import os
 
-SECRET_KEY = '=r-$b*8hglm+858&9t043hlm6-&6-3d3vfc4((7yd0dbrakhvi'
+SECRET_KEY = '_vbf!dik)(2$3(&%#9s+&grhse=@r%v07ljm$rh(y=$8m&jgdz'
 
 INSTALLED_APPS = (
     'djangotoolbox',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'core',
+    'mlp_gae.mainsite',
 )
 
 if has_djangoappengine:
@@ -24,8 +24,12 @@ if has_djangoappengine:
 TEST_RUNNER = 'djangotoolbox.test.CapturingTestSuiteRunner'
 
 ADMIN_MEDIA_PREFIX = '/media/admin/'
-MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media')
-TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates'),)
+MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'static')
+MEDIA_URL = '/media/'
+TEMPLATE_DIRS = (
+	os.path.join(os.path.dirname(__file__), 'templates'),
+	os.path.join(os.path.dirname(__file__), 'static'),
+	)
 
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'

@@ -254,34 +254,34 @@ class DjangoTestSuiteRunner(object):
         return reorder_suite(suite, (TestCase,))
 
     def setup_databases(self, **kwargs):
-        from django.db import connections
+        from django.db import connection
         old_names = []
         mirrors = []
-        for alias in connections:
-            connection = connections[alias]
+        for alias in connection:
+            connec = connection[alias]
             # If the database is a test mirror, redirect it's connection
             # instead of creating a test database.
-            if connection.settings_dict['TEST_MIRROR']:
-                mirrors.append((alias, connection))
-                mirror_alias = connection.settings_dict['TEST_MIRROR']
-                connections._connections[alias] = connections[mirror_alias]
+            if connec.settings_dict['TEST_MIRROR']:
+                mirrors.append((alias, connec))
+                mirror_alias = connec.settings_dict['TEST_MIRROR']
+                connec._connections[alias] = connec[mirror_alias]
             else:
-                old_names.append((connection, connection.settings_dict['NAME']))
-                connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
+                old_names.append((connec, connec.settings_dict['NAME']))
+                connec.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
         return old_names, mirrors
 
     def run_suite(self, suite, **kwargs):
         return DjangoTestRunner(verbosity=self.verbosity, failfast=self.failfast).run(suite)
 
     def teardown_databases(self, old_config, **kwargs):
-        from django.db import connections
+        from django.db import connection
         old_names, mirrors = old_config
         # Point all the mirrors back to the originals
-        for alias, connection in mirrors:
-            connections._connections[alias] = connection
+        for alias, connec in mirrors:
+            connec._connections[alias] = connection
         # Destroy all the non-mirror databases
-        for connection, old_name in old_names:
-            connection.creation.destroy_test_db(old_name, self.verbosity)
+        for connec, old_name in old_names:
+            connec.creation.destroy_test_db(old_name, self.verbosity)
 
     def teardown_test_environment(self, **kwargs):
         teardown_test_environment()

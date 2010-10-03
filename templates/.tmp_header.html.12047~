@@ -1,0 +1,10 @@
+<div id="header" class="round">
+	<!-- logo -->	
+<ul class="navigation round">
+		<li>Home</li>
+		<li>Blog</li>
+		<li>Labs</li>
+		<li>Products</li>
+		<li>Demos</li>
+	</ul>
+</div>	

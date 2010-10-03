@@ -1,8 +1,12 @@
 from .testmodels import FieldsWithOptionsModel, EmailModel, DateTimeModel, OrderedModel
+from ..db.utils import get_cursor
 import datetime, time
 from django.test import TestCase
 from django.db.models import Q
 from django.db.utils import DatabaseError
+from djangoappengine.db.utils import set_cursor
+from djangoappengine.tests.testmodels import BlobModel
+from google.appengine.api.datastore import Get, Key
 
 class FilterTest(TestCase):
     floats = [5.3, 2.6, 9.1, 1.58]
@@ -156,15 +160,6 @@ class FilterTest(TestCase):
                           email='rinnengan@sage.de').order_by('email')],
                           ['rinnengan@sage.de'])
 
-        # test using exact
-        self.assertEquals(FieldsWithOptionsModel.objects.filter(
-                          email__exact='rinnengan@sage.de')[0].email,
-                          'rinnengan@sage.de')
-
-        self.assertEquals(FieldsWithOptionsModel.objects.filter(
-                           pk='app-engine@scholardocs.com')[0].email,
-                          'app-engine@scholardocs.com')
-
     def test_is_null(self):
         self.assertEquals(FieldsWithOptionsModel.objects.filter(
             floating_point__isnull=True).count(), 0)
@@ -276,6 +271,20 @@ class FilterTest(TestCase):
                           FieldsWithOptionsModel.objects.all().order_by(
                             'email')[::2]],
                           ['app-engine@scholardocs.com', 'rinnengan@sage.de',])
+
+    def test_cursor(self):
+        results = list(FieldsWithOptionsModel.objects.all())
+        cursor = None
+        for item in results:
+            query = FieldsWithOptionsModel.objects.all()[:1]
+            if cursor is not None:
+                set_cursor(query, cursor)
+            next = query[0]
+            self.assertEqual(next.pk, item.pk)
+            cursor = get_cursor(query)
+        query = FieldsWithOptionsModel.objects.all()[:1]
+        set_cursor(query, cursor)
+        self.assertEqual(list(query), [])
 
     def test_Q_objects(self):
         self.assertEquals([entity.email for entity in
@@ -406,3 +415,12 @@ class FilterTest(TestCase):
     def test_latest(self):
         self.assertEquals(FieldsWithOptionsModel.objects.latest('time').floating_point,
                             1.58)
+
+    def test_blob(self):
+        x = BlobModel(data='lalala')
+        x.full_clean()
+        x.save()
+        e = Get(Key.from_path(BlobModel._meta.db_table, x.pk))
+        self.assertEqual(e['data'], x.data)
+        x = BlobModel.objects.all()[0]
+        self.assertEqual(e['data'], x.data)
